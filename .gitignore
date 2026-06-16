@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# Django
+db.sqlite3
+
+# Secrets
+.env
+
+# Node
+node_modules/
+
+# Build
+dist/
+build/
+.env
