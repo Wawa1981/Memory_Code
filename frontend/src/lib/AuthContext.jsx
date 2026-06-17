@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoadingAuth(true);
       const token = localStorage.getItem('access_token');
-      
+
       if (!token) {
         setIsAuthenticated(false);
         setUser(null);
@@ -24,30 +24,38 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      // Tu peux ajouter un appel API pour vérifier le token si tu veux
-      // Ex: const res = await authAPI.getCurrentUser();
-      
+      const response = await authAPI.getMe();
+      setUser(response.data);
       setIsAuthenticated(true);
-      setUser({}); 
       setAuthError(null);
     } catch (err) {
       console.error(err);
       setIsAuthenticated(false);
       setUser(null);
       setAuthError(err.response?.data || { type: 'unauthorized' });
+      authAPI.logout();
     } finally {
       setIsLoadingAuth(false);
       setAuthChecked(true);
     }
   };
 
-  const login = async (email, password) => {
-    const data = await authAPI.login(email, password);
+  const login = async (username, password) => {
+    const response = await authAPI.login(username, password);
+    const data = response.data;
+
     if (data.access) {
       localStorage.setItem('access_token', data.access);
+      if (data.refresh) {
+        localStorage.setItem('refresh_token', data.refresh);
+      }
+
+      const meResponse = await authAPI.getMe();
+      setUser(meResponse.data);
       setIsAuthenticated(true);
-      setUser(data.user || {});
+      setAuthError(null);
     }
+
     return data;
   };
 
@@ -60,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     setAuthChecked(false);
+    setAuthError(null);
   };
 
   useEffect(() => {
@@ -67,17 +76,19 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated,
-      isLoadingAuth,
-      authChecked,
-      authError,
-      checkUserAuth,
-      login,
-      register,
-      logout
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        isLoadingAuth,
+        authChecked,
+        authError,
+        checkUserAuth,
+        login,
+        register,
+        logout
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
