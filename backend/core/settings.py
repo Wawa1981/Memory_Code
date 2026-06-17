@@ -1,6 +1,11 @@
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+load_dotenv(BASE_DIR.parent / ".env")
 
 SECRET_KEY = 'django-insecure-7n_sp4gf08cj#dt47si8(w4pvv&#uc1h$p)8y&c!qz-3figo^^'
 
@@ -10,6 +15,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'daphne',
+    'channels',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -23,6 +30,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
 
     'game',
+    'chat',
+    'rtc',
 
     'allauth',
     'allauth.account',
