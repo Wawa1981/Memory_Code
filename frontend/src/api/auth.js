@@ -3,12 +3,11 @@ import apiClient from './client';
 export const authAPI = {
   register: (data) => apiClient.post('/register/', data),
 
-  login: (username, password) =>
-    apiClient.post('/token/', {
-      username,
-      password,
-    }),
-
+  login: (email, password) =>
+  apiClient.post('/token/', {
+    username: email,
+    password,
+  }),
   getMe: () => apiClient.get('/me/'),
 
   logout: () => {

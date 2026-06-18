@@ -12,18 +12,23 @@ class GameScoreSerializer(serializers.ModelSerializer):
 
 
 class PlayerRegistrationSerializer(serializers.ModelSerializer):
-    # write_only=True garantit que le mot de passe ne sera jamais renvoyé pour être lu
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = Player
         fields = ['username', 'email', 'password']
+        extra_kwargs = {
+            'username': {'required': False, 'allow_blank': True},
+        }
 
     def create(self, validated_data):
-        # On utilise create_user (et non create) pour que Django hache automatiquement le mot de passe
+        email = validated_data['email'].strip().lower()
+        password = validated_data['password']
+        username = email
+
         user = Player.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data.get('email', ''),
-            password=validated_data['password']
+            username=username,
+            email=email,
+            password=password
         )
         return user
